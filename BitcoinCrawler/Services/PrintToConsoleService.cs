@@ -44,11 +44,11 @@ namespace BitcoinCrawler.Services
 			Console.WriteLine("MIX: {0:N2}", this._repositoryService.GetAggregatedValue(RepositoryService.AggregateType.Min, 5));
 			Console.WriteLine();
 
-			//Console.WriteLine("Last 2 minutes");
-			//Console.WriteLine("--------------");
-			//Console.WriteLine("AVERAGE: {0:N2}", data.Where(x => this._unixTimeService.BelongsToLastTwoMinutes(x.Timestamp)).Average(x => x.Value));
-			//Console.WriteLine("MAX: {0:N2}", data.Where(x => this._unixTimeService.BelongsToLastTwoMinutes(x.Timestamp)).Max(x => x.Value));
-			//Console.WriteLine("MIX: {0:N2}", data.Where(x => this._unixTimeService.BelongsToLastTwoMinutes(x.Timestamp)).Min(x => x.Value));
+			Console.WriteLine("Last 2 minutes");
+			Console.WriteLine("--------------");
+			Console.WriteLine("AVERAGE: {0:N2}", this._repositoryService.GetAggregatedValue(RepositoryService.AggregateType.Average, x => this._unixTimeService.BelongsToLastTwoMinutes(x.Timestamp)));
+			Console.WriteLine("MAX: {0:N2}", this._repositoryService.GetAggregatedValue(RepositoryService.AggregateType.Max, x => this._unixTimeService.BelongsToLastTwoMinutes(x.Timestamp)));
+			Console.WriteLine("MIX: {0:N2}", this._repositoryService.GetAggregatedValue(RepositoryService.AggregateType.Min, x => this._unixTimeService.BelongsToLastTwoMinutes(x.Timestamp)));
 		}
 	}
 }
