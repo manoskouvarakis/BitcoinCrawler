@@ -3,6 +3,7 @@ using BitcoinCrawler.Exchange;
 using BitcoinCrawler.Model;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -32,19 +33,38 @@ namespace BitcoinCrawler.Services
 			_visualizationService = visualizationService;
 		}
 
-		public async Task RunAsync()
+		public async Task RunAsync(CancellationToken token = default(CancellationToken))
 		{
-			while (true)
+			while (!token.IsCancellationRequested)
 			{
-				BitcoinPrice bitstampPrice = await this._bitstampService.GetBitcoinPriceAsync();
-				this._repositoryService.Persist(bitstampPrice);
+				List<Task<BitcoinPrice>> fetchPriceTasks = new List<Task<BitcoinPrice>>
+				{
+					this._bitstampService.GetBitcoinPriceAsync(),
+					this._gdaxService.GetBitcoinPriceAsync()
+				};
 
-				BitcoinPrice gdaxPrice = await this._gdaxService.GetBitcoinPriceAsync();
-				this._repositoryService.Persist(gdaxPrice);
+				while (fetchPriceTasks.Count > 0)
+				{
+					//Identify the first task that completes.  
+					Task<BitcoinPrice> firstFinishedTask = await Task.WhenAny(fetchPriceTasks);
+
+					fetchPriceTasks.Remove(firstFinishedTask);
+
+					// Await the completed task.
+					BitcoinPrice newPrice = await firstFinishedTask;
+					this._repositoryService.Persist(newPrice);
+				}
 
 				this._visualizationService.Visualize();
 
-				Thread.Sleep(10000);
+				try
+				{
+					await Task.Delay(TimeSpan.FromSeconds(10), token);
+				}
+				catch (TaskCanceledException)
+				{
+					break;
+				}
 			}
 		}
 	}
