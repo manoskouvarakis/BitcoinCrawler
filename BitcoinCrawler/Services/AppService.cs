@@ -52,7 +52,7 @@ namespace BitcoinCrawler.Services
 
 					// Await the completed task.
 					BitcoinPrice newPrice = await firstFinishedTask;
-					this._repositoryService.Persist(newPrice);
+					if (newPrice != null) this._repositoryService.Persist(newPrice);
 				}
 
 				this._visualizationService.Visualize();
