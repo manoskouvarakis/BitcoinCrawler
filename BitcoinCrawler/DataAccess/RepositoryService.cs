@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using static BitcoinCrawler.Extensions;
 
@@ -47,6 +48,28 @@ namespace BitcoinCrawler.DataAccess
 				case AggregateType.Average: return this.queue.TakeLast(takeLastElementsCounter).Average(x => x.Value);
 				case AggregateType.Max: return this.queue.TakeLast(takeLastElementsCounter).Max(x => x.Value);
 				case AggregateType.Min: return this.queue.TakeLast(takeLastElementsCounter).Min(x => x.Value);
+				default: return 0;
+			}
+		}
+
+		public decimal GetAggregatedValue(AggregateType type, Func<BitcoinPrice, bool> filter)
+		{
+			switch (type)
+			{
+				case AggregateType.Average: return this.queue.Where(filter).Average(x => x.Value);
+				case AggregateType.Max: return this.queue.Where(filter).Max(x => x.Value);
+				case AggregateType.Min: return this.queue.Where(filter).Min(x => x.Value);
+				default: return 0;
+			}
+		}
+
+		public decimal GetAggregatedValue(AggregateType type, Func<BitcoinPrice, bool> filter, int takeLastElementsCounter)
+		{
+			switch (type)
+			{
+				case AggregateType.Average: return this.queue.Where(filter).TakeLast(takeLastElementsCounter).Average(x => x.Value);
+				case AggregateType.Max: return this.queue.Where(filter).TakeLast(takeLastElementsCounter).Max(x => x.Value);
+				case AggregateType.Min: return this.queue.Where(filter).TakeLast(takeLastElementsCounter).Min(x => x.Value);
 				default: return 0;
 			}
 		}

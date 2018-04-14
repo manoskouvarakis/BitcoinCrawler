@@ -15,5 +15,7 @@ namespace BitcoinCrawler.DataAccess
 
 		decimal GetAggregatedValue(AggregateType type);
 		decimal GetAggregatedValue(AggregateType type, int takeLastElementsCounter);
+		decimal GetAggregatedValue(AggregateType type, Func<BitcoinPrice, bool> filter);
+		decimal GetAggregatedValue(AggregateType type, Func<BitcoinPrice, bool> filter, int takeLastElementsCounter);
 	}
 }
