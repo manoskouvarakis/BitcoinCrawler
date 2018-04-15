@@ -18,8 +18,7 @@ namespace BitcoinCrawler.Serializers
 		{
 			JObject jsonObject = JObject.Load(reader);
 
-			BitcoinPrice configuration = new BitcoinPrice();
-			configuration.Origin = BitcoinPrice.OriginType.Bitstamp;
+			BitcoinPriceBase configuration = new BitstampBitcoinPrice();
 			configuration.Timestamp = (long)jsonObject["timestamp"];
 			configuration.Value = (decimal)jsonObject["last"];
 
@@ -28,7 +27,7 @@ namespace BitcoinCrawler.Serializers
 
 		public override bool CanConvert(Type objectType)
 		{
-			return typeof(BitcoinPrice).IsAssignableFrom(objectType);
+			return typeof(BitcoinPriceBase).IsAssignableFrom(objectType);
 		}
 	}
 }

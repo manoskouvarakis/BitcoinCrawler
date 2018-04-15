@@ -7,7 +7,7 @@ using System.Text;
 
 namespace BitcoinCrawler.Model
 {
-	public class BitcoinPrice
+	public abstract class BitcoinPriceBase : IBitcoinPrice
 	{
 		public enum OriginType
 		{
@@ -19,6 +19,16 @@ namespace BitcoinCrawler.Model
 
 		public decimal Value { get; set; }
 
-		public OriginType Origin { get; set; }
+		public abstract OriginType Origin { get; }
+
+		public decimal GetValue()
+		{
+			return this.Value;
+		}
+
+		public long GetUnixTime()
+		{
+			return this.Timestamp;
+		}
 	}
 }

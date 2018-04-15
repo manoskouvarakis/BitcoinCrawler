@@ -43,9 +43,9 @@ namespace BitcoinCrawler.Exchange
 			//gdaxClient.DefaultRequestHeaders.Add("CB-ACCESS-PASSPHRASE", passPhrase);
 		}
 
-		public async Task<BitcoinPrice> GetBitcoinPriceAsync()
+		public async Task<IBitcoinPrice> GetBitcoinPriceAsync()
 		{
-			BitcoinPrice product = null;
+			IBitcoinPrice product = null;
 
 			String gdaxCurrencyPair = "BTC-USD";
 			string method = "/products/" + gdaxCurrencyPair + "/ticker";
@@ -54,7 +54,7 @@ namespace BitcoinCrawler.Exchange
 			if (response.IsSuccessStatusCode)
 			{
 				String json = await response.Content.ReadAsStringAsync();
-				product = JsonConvert.DeserializeObject<BitcoinPrice>(json, this._serializer);
+				product = JsonConvert.DeserializeObject<GdaxBitcoinPrice>(json, this._serializer);
 			}
 
 			return product;

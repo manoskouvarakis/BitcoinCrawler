@@ -26,8 +26,7 @@ namespace BitcoinCrawler.Serializers
 		{
 			JObject jsonObject = JObject.Load(reader);
 
-			BitcoinPrice configuration = new BitcoinPrice();
-			configuration.Origin = BitcoinPrice.OriginType.Gdax;
+			BitcoinPriceBase configuration = new GdaxBitcoinPrice();
 			configuration.Value = (decimal)jsonObject["price"];
 
 			DateTime temp = DateTime.Parse(jsonObject["time"].ToString());
@@ -40,7 +39,7 @@ namespace BitcoinCrawler.Serializers
 
 		public override bool CanConvert(Type objectType)
 		{
-			return typeof(BitcoinPrice).IsAssignableFrom(objectType);
+			return typeof(BitcoinPriceBase).IsAssignableFrom(objectType);
 		}
 	}
 }

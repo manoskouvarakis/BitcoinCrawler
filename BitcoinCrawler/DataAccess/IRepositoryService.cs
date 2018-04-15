@@ -8,14 +8,14 @@ namespace BitcoinCrawler.DataAccess
 {
     public interface IRepositoryService
     {
-		void Persist(BitcoinPrice bitcoinPrice);
-		BitcoinPrice Retrieve(decimal value);
+		void Persist(IBitcoinPrice bitcoinPrice);
+		IBitcoinPrice Retrieve(decimal value);
 
 		decimal GetLastValue();
 
 		decimal GetAggregatedValue(AggregateType type);
 		decimal GetAggregatedValue(AggregateType type, int takeLastElementsCounter);
-		decimal GetAggregatedValue(AggregateType type, Func<BitcoinPrice, bool> filter);
-		decimal GetAggregatedValue(AggregateType type, Func<BitcoinPrice, bool> filter, int takeLastElementsCounter);
+		decimal GetAggregatedValue(AggregateType type, Func<IBitcoinPrice, bool> filter);
+		decimal GetAggregatedValue(AggregateType type, Func<IBitcoinPrice, bool> filter, int takeLastElementsCounter);
 	}
 }

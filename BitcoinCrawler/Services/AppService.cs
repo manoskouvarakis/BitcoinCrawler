@@ -37,7 +37,7 @@ namespace BitcoinCrawler.Services
 		{
 			while (!token.IsCancellationRequested)
 			{
-				List<Task<BitcoinPrice>> fetchPriceTasks = new List<Task<BitcoinPrice>>
+				List<Task<IBitcoinPrice>> fetchPriceTasks = new List<Task<IBitcoinPrice>>
 				{
 					this._bitstampService.GetBitcoinPriceAsync(),
 					this._gdaxService.GetBitcoinPriceAsync()
@@ -46,12 +46,12 @@ namespace BitcoinCrawler.Services
 				while (fetchPriceTasks.Count > 0)
 				{
 					//Identify the first task that completes.  
-					Task<BitcoinPrice> firstFinishedTask = await Task.WhenAny(fetchPriceTasks);
+					Task<IBitcoinPrice> firstFinishedTask = await Task.WhenAny(fetchPriceTasks);
 
 					fetchPriceTasks.Remove(firstFinishedTask);
 
 					// Await the completed task.
-					BitcoinPrice newPrice = await firstFinishedTask;
+					IBitcoinPrice newPrice = await firstFinishedTask;
 					if (newPrice != null) this._repositoryService.Persist(newPrice);
 				}
 

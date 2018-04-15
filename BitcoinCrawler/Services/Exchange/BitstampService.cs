@@ -27,15 +27,17 @@ namespace BitcoinCrawler.Exchange
 			bitstampClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 		}
 
-		public async Task<BitcoinPrice> GetBitcoinPriceAsync()
+		public async Task<IBitcoinPrice> GetBitcoinPriceAsync()
 		{
-			BitcoinPrice product = null;
+			IBitcoinPrice product = null;
+
 			HttpResponseMessage response = await bitstampClient.GetAsync(bitstampClient.BaseAddress);
 			if (response.IsSuccessStatusCode)
 			{
 				String json = await response.Content.ReadAsStringAsync();
-				product = JsonConvert.DeserializeObject<BitcoinPrice>(json, this._serializer);
+				product = JsonConvert.DeserializeObject<BitstampBitcoinPrice>(json, this._serializer);
 			}
+
 			return product;
 		}
 	}

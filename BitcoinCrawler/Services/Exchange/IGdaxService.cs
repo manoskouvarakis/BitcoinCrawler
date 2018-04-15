@@ -8,6 +8,6 @@ namespace BitcoinCrawler.Exchange
 {
     public interface IGdaxService
 	{
-		Task<BitcoinPrice> GetBitcoinPriceAsync();
+		Task<IBitcoinPrice> GetBitcoinPriceAsync();
 	}
 }
