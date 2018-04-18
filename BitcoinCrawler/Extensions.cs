@@ -14,29 +14,21 @@ namespace BitcoinCrawler
 			return source.Skip(Math.Max(0, source.Count() - N));
 		}
 
-		public class FixedSizedQueue<T> : ConcurrentQueue<T>
+		private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+		public static bool BelongsToLastMinutes(this long value, int minutes)
 		{
-			private readonly object syncObject = new object();
+			return value > Extensions.GetUnixTimestampInSeconds(DateTime.UtcNow.AddMinutes(-minutes));
+		}
 
-			public int Size { get; private set; }
+		public static long GetUnixTimestampInSeconds(this DateTime value)
+		{
+			return (long)(value - Extensions.UnixEpoch).TotalSeconds;
+		}
 
-			public FixedSizedQueue(int size)
-			{
-				Size = size;
-			}
-
-			public new void Enqueue(T obj)
-			{
-				base.Enqueue(obj);
-				lock (syncObject)
-				{
-					while (base.Count > Size)
-					{
-						T outObj;
-						base.TryDequeue(out outObj);
-					}
-				}
-			}
+		public static DateTime DateTimeFromUnixTimestampSeconds(this long seconds)
+		{
+			return Extensions.UnixEpoch.AddSeconds(seconds);
 		}
 	}
 }

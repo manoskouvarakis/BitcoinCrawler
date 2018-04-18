@@ -1,10 +1,12 @@
-﻿using BitcoinCrawler.Model;
+﻿using BitcoinCrawler.Helpers;
+using BitcoinCrawler.Model;
+using BitcoinCrawler.Options;
+using Microsoft.Extensions.Options;
+using MoreLinq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using static BitcoinCrawler.Extensions;
 
 namespace BitcoinCrawler.DataAccess
 {
@@ -17,66 +19,120 @@ namespace BitcoinCrawler.DataAccess
 			Average
 		}
 
+		public enum TrendType
+		{
+			Up,
+			Down
+		}
 
-		private FixedSizedQueue<IBitcoinPrice> queue = new FixedSizedQueue<IBitcoinPrice>(10);
+		private readonly RepositoryServiceOptions _repositoryServiceOptions;
+
+		public RepositoryService(IOptions<RepositoryServiceOptions> repositoryServiceOptions)
+		{
+			this._repositoryServiceOptions = repositoryServiceOptions.Value;
+		}
+
+		private ConcurrentDictionary<CurrencyPair, FixedSizedQueue<IBitcoinPrice>> inMemoryStorage = new ConcurrentDictionary<CurrencyPair, FixedSizedQueue<IBitcoinPrice>>();
+		private ConcurrentDictionary<CurrencyPair, decimal> lastPricePerCurrency = new ConcurrentDictionary<CurrencyPair, decimal>();
 
 		public void Persist(IBitcoinPrice bitcoinPrice)
 		{
-			this.queue.Enqueue(bitcoinPrice);
+			FixedSizedQueue<IBitcoinPrice> newQueue = new FixedSizedQueue<IBitcoinPrice>(this._repositoryServiceOptions.MemorySize);
+			newQueue.Enqueue(bitcoinPrice);
+			this.inMemoryStorage.AddOrUpdate(bitcoinPrice.Currency, newQueue,
+				(key, existingVal) =>
+				{
+					existingVal.Enqueue(bitcoinPrice);
+					return existingVal;
+				});
+		}
+
+		public IEnumerable<CurrencyPair> GetCurrencyPairs()
+		{
+			return this.inMemoryStorage.Keys;
+		}
+
+		public Boolean IsEmpty()
+		{
+			return this.inMemoryStorage.IsEmpty;
 		}
 
 		public IBitcoinPrice Retrieve(decimal value)
 		{
-			return this.queue.FirstOrDefault(x => x.GetValue() == value);
+			return null;
+			//return this.queue.FirstOrDefault(x => x.GetValue() == value);
 		}
 
-		public decimal GetAggregatedValue(AggregateType type)
+		public IBitcoinPrice Max(CurrencyPair currencyPair)
+		{
+			return this.inMemoryStorage[currencyPair].MaxBy(x => x.Value);
+		}
+
+		public IBitcoinPrice Min(CurrencyPair currencyPair)
+		{
+			return this.inMemoryStorage[currencyPair].MinBy(x => x.Value);
+		}
+
+		public decimal GetAggregatedValue(AggregateType type, CurrencyPair currency)
 		{
 			switch (type)
 			{
-				case AggregateType.Average: return this.queue.Average(x => x.GetValue());
-				case AggregateType.Max: return this.queue.Max(x => x.GetValue());
-				case AggregateType.Min: return this.queue.Min(x => x.GetValue());
+				case AggregateType.Average: return this.inMemoryStorage[currency].Average(x => x.Value);
+				case AggregateType.Max: return this.inMemoryStorage[currency].Max(x => x.Value);
+				case AggregateType.Min: return this.inMemoryStorage[currency].Min(x => x.Value);
 				default: return 0;
 			}
 		}
 
-		public decimal GetAggregatedValue(AggregateType type, int takeLastElementsCounter)
+		public decimal GetAggregatedValue(AggregateType type, CurrencyPair currency, int takeLastElementsCounter)
 		{
 			switch (type)
 			{
-				case AggregateType.Average: return this.queue.TakeLast(takeLastElementsCounter).Average(x => x.GetValue());
-				case AggregateType.Max: return this.queue.TakeLast(takeLastElementsCounter).Max(x => x.GetValue());
-				case AggregateType.Min: return this.queue.TakeLast(takeLastElementsCounter).Min(x => x.GetValue());
+				case AggregateType.Average: return this.inMemoryStorage[currency].TakeLast(takeLastElementsCounter).Average(x => x.Value);
+				case AggregateType.Max: return this.inMemoryStorage[currency].TakeLast(takeLastElementsCounter).Max(x => x.Value);
+				case AggregateType.Min: return this.inMemoryStorage[currency].TakeLast(takeLastElementsCounter).Min(x => x.Value);
 				default: return 0;
 			}
 		}
 
-		public decimal GetAggregatedValue(AggregateType type, Func<IBitcoinPrice, bool> filter)
+		public decimal GetAggregatedValue(AggregateType type, CurrencyPair currency, Func<IBitcoinPrice, bool> filter)
 		{
 			switch (type)
 			{
-				case AggregateType.Average: return this.queue.Where(filter).Average(x => x.GetValue());
-				case AggregateType.Max: return this.queue.Where(filter).Max(x => x.GetValue());
-				case AggregateType.Min: return this.queue.Where(filter).Min(x => x.GetValue());
+				case AggregateType.Average: return this.inMemoryStorage[currency].Where(filter).Average(x => x.Value);
+				case AggregateType.Max: return this.inMemoryStorage[currency].Where(filter).Max(x => x.Value);
+				case AggregateType.Min: return this.inMemoryStorage[currency].Where(filter).Min(x => x.Value);
 				default: return 0;
 			}
 		}
 
-		public decimal GetAggregatedValue(AggregateType type, Func<IBitcoinPrice, bool> filter, int takeLastElementsCounter)
+		public decimal GetAggregatedValue(AggregateType type, CurrencyPair currency, Func<IBitcoinPrice, bool> filter, int takeLastElementsCounter)
 		{
 			switch (type)
 			{
-				case AggregateType.Average: return this.queue.Where(filter).TakeLast(takeLastElementsCounter).Average(x => x.GetValue());
-				case AggregateType.Max: return this.queue.Where(filter).TakeLast(takeLastElementsCounter).Max(x => x.GetValue());
-				case AggregateType.Min: return this.queue.Where(filter).TakeLast(takeLastElementsCounter).Min(x => x.GetValue());
+				case AggregateType.Average: return this.inMemoryStorage[currency].Where(filter).TakeLast(takeLastElementsCounter).Average(x => x.Value);
+				case AggregateType.Max: return this.inMemoryStorage[currency].Where(filter).TakeLast(takeLastElementsCounter).Max(x => x.Value);
+				case AggregateType.Min: return this.inMemoryStorage[currency].Where(filter).TakeLast(takeLastElementsCounter).Min(x => x.Value);
 				default: return 0;
 			}
 		}
 
-		public decimal GetLastValue()
+		public decimal GetLastValue(CurrencyPair currency, out TrendType trend)
 		{
-			return this.queue.Last().GetValue();
+			decimal newPrice = this.inMemoryStorage[currency].Last().Value;
+
+			bool tryGetValue = this.lastPricePerCurrency.TryGetValue(currency, out decimal value);
+
+			trend = tryGetValue ? newPrice > this.lastPricePerCurrency[currency] ? TrendType.Up : TrendType.Down : TrendType.Up;
+
+			this.lastPricePerCurrency.AddOrUpdate(currency, newPrice,
+				(key, existingVal) =>
+				{
+					existingVal = newPrice;
+					return existingVal;
+				});
+
+			return newPrice;
 		}
 	}
 }

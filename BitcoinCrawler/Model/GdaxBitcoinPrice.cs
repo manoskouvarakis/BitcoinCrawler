@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BitcoinCrawler.Model
+﻿namespace BitcoinCrawler.Model
 {
     public class GdaxBitcoinPrice : BitcoinPriceBase
     {
-		public override OriginType Origin { get { return OriginType.Gdax; } }
+		public override Origin Origin { get { return Origin.GDAX; } }
 	}
 }

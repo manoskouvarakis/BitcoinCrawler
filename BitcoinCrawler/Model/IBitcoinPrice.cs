@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BitcoinCrawler.Model
+﻿namespace BitcoinCrawler.Model
 {
     public interface IBitcoinPrice
     {
-		decimal GetValue();
+		decimal Value { get; set; }
 
-		long GetUnixTime();
-    }
+		long Timestamp { get; set; }
+
+		CurrencyPair Currency { get; set; }
+
+		Origin Origin { get; }
+	}
 }

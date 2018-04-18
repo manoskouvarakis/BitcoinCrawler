@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitcoinCrawler", "BitcoinCrawler\BitcoinCrawler.csproj", "{FF21955F-63CB-4624-85B6-502D35C5B95D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BitcoinCrawler", "BitcoinCrawler\BitcoinCrawler.csproj", "{FF21955F-63CB-4624-85B6-502D35C5B95D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitcoinCrawlerTests", "BitcoinCrawlerTests\BitcoinCrawlerTests.csproj", "{E6EA9EDA-340A-4577-A372-B80B6E252FA8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{FF21955F-63CB-4624-85B6-502D35C5B95D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF21955F-63CB-4624-85B6-502D35C5B95D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF21955F-63CB-4624-85B6-502D35C5B95D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6EA9EDA-340A-4577-A372-B80B6E252FA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6EA9EDA-340A-4577-A372-B80B6E252FA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6EA9EDA-340A-4577-A372-B80B6E252FA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6EA9EDA-340A-4577-A372-B80B6E252FA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
