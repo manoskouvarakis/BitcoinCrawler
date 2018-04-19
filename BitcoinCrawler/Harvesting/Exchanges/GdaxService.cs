@@ -20,7 +20,7 @@ namespace BitcoinCrawler.Harvesting
 		private readonly GdaxServiceOptions _gdaxServiceOptions;
 		private readonly ILogger _logger;
 
-		private static HttpClient gdaxClient = new HttpClient();
+		internal static HttpClient _gdaxClient;
 
 		public GdaxService(GdaxSerializer serializer, IOptions<GdaxServiceOptions> gdaxServiceOptions, ILogger<GdaxService> logger)
 		{
@@ -28,11 +28,14 @@ namespace BitcoinCrawler.Harvesting
 			this._gdaxServiceOptions = gdaxServiceOptions.Value;
 			this._logger = logger;
 
-			gdaxClient.BaseAddress = new Uri(this._gdaxServiceOptions.BaseUrl);
+			_gdaxClient = new HttpClient
+			{
+				BaseAddress = new Uri(this._gdaxServiceOptions.BaseUrl)
+			};
 
-			gdaxClient.DefaultRequestHeaders.Accept.Clear();
-			gdaxClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			gdaxClient.DefaultRequestHeaders.Add("User-Agent", ".NET Framework Test Client");
+			_gdaxClient.DefaultRequestHeaders.Accept.Clear();
+			_gdaxClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+			_gdaxClient.DefaultRequestHeaders.Add("User-Agent", ".NET Framework Test Client");
 		}
 
 		public async Task<IBitcoinPrice> GetPriceAsync(HarvestTask task)
@@ -46,7 +49,7 @@ namespace BitcoinCrawler.Harvesting
 			string method = "products/" + this.APICurrencyId[task.Pair] + "/ticker";
 
 			this._logger.LogInformation("Fetch new price");
-			HttpResponseMessage response = await gdaxClient.GetAsync(method);
+			HttpResponseMessage response = await _gdaxClient.GetAsync(method);
 			if (!response.IsSuccessStatusCode)
 			{
 				this._logger.LogError("Error response from exchange API");
@@ -83,10 +86,10 @@ namespace BitcoinCrawler.Harvesting
 			String passPhrase = "";
 			string ts = this.GetNonce();
 			string sig = GetSignature(ts, "GET", method, string.Empty);
-			gdaxClient.DefaultRequestHeaders.Add("CB-ACCESS-KEY", publicKey);
-			gdaxClient.DefaultRequestHeaders.Add("CB-ACCESS-SIGN", sig);
-			gdaxClient.DefaultRequestHeaders.Add("CB-ACCESS-TIMESTAMP", ts);
-			gdaxClient.DefaultRequestHeaders.Add("CB-ACCESS-PASSPHRASE", passPhrase);
+			_gdaxClient.DefaultRequestHeaders.Add("CB-ACCESS-KEY", publicKey);
+			_gdaxClient.DefaultRequestHeaders.Add("CB-ACCESS-SIGN", sig);
+			_gdaxClient.DefaultRequestHeaders.Add("CB-ACCESS-TIMESTAMP", ts);
+			_gdaxClient.DefaultRequestHeaders.Add("CB-ACCESS-PASSPHRASE", passPhrase);
 		}
 
 		private string GetNonce()

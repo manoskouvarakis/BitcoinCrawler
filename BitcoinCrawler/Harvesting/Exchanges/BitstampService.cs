@@ -18,7 +18,7 @@ namespace BitcoinCrawler.Harvesting
 		private readonly BitstampServiceOptions _bitstampServiceOptions;
 		private readonly ILogger _logger;
 
-		private static HttpClient bitstampClient = new HttpClient();
+		internal static HttpClient _bitstampClient;
 
 		public BitstampService(BitstampSerializer serializer, IOptions<BitstampServiceOptions> bitstampServiceOptions, ILogger<BitstampService> logger)
 		{
@@ -26,10 +26,13 @@ namespace BitcoinCrawler.Harvesting
 			this._bitstampServiceOptions = bitstampServiceOptions.Value;
 			this._logger = logger;
 
-			bitstampClient.BaseAddress = new Uri(this._bitstampServiceOptions.BaseUrl);
+			_bitstampClient = new HttpClient
+			{
+				BaseAddress = new Uri(this._bitstampServiceOptions.BaseUrl)
+			};
 
-			bitstampClient.DefaultRequestHeaders.Accept.Clear();
-			bitstampClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+			_bitstampClient.DefaultRequestHeaders.Accept.Clear();
+			_bitstampClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 		}
 
 		public async Task<IBitcoinPrice> GetPriceAsync(HarvestTask task)
@@ -43,7 +46,7 @@ namespace BitcoinCrawler.Harvesting
 			String method = this.APICurrencyId[task.Pair] + '/';
 
 			this._logger.LogInformation("Fetch new price");
-			HttpResponseMessage response = await bitstampClient.GetAsync(method);
+			HttpResponseMessage response = await _bitstampClient.GetAsync(method);
 			if (!response.IsSuccessStatusCode)
 			{
 				this._logger.LogError("Error response from exchange API");
