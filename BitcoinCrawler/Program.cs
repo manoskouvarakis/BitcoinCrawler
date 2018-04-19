@@ -4,12 +4,17 @@ using BitcoinCrawler.Serializers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BitcoinCrawler
 {
     class Program
     {
+		private static readonly CancellationTokenSource cts = new CancellationTokenSource();
+		 
 		static void Main(string[] args)
         {
 			//configure services
@@ -42,6 +47,8 @@ namespace BitcoinCrawler
 
 			serviceCollection.AddLogging(configure => configure.AddDebug());
 
+			Console.CancelKeyPress += new ConsoleCancelEventHandler(Console_CancelKeyPress);
+
 			//create a service provider from the service collection
 			var serviceProvider = serviceCollection.BuildServiceProvider();
 
@@ -49,7 +56,25 @@ namespace BitcoinCrawler
 			var appService = serviceProvider.GetService<AppService>();
 
 			//run the application
-			appService.Run();
+			Task[] tasks = appService.Run(cts.Token);
+
+			//wait for signal
+			cts.Token.WaitHandle.WaitOne();
+
+			//wait all tasks to finish
+			Task.WaitAll(tasks);
+
+			cts.Dispose();
+		}
+
+		static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
+		{
+			Console.WriteLine("Exiting");
+			if (e.SpecialKey == ConsoleSpecialKey.ControlC)
+			{
+				cts.Cancel();
+				e.Cancel = true;
+			}
 		}
 	}
 }

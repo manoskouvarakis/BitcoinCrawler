@@ -25,7 +25,9 @@ namespace BitcoinCrawler.Harvesting
 				//This is a known bug named feature for the purpose of this assignment.
 				//It can be solved using a concurrent queue or dictionary, checking for existence before adding new tasks.
 				foreach (HarvestTask harvestTask in this._harvestingOrchestratorServiceOptions.Tasks)
+				{
 					this._taskQueue.Add(harvestTask);
+				}
 
 				try
 				{
@@ -36,7 +38,6 @@ namespace BitcoinCrawler.Harvesting
 					break;
 				}
 			}
-
 		}
 	}
 }

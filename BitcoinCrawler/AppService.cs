@@ -28,8 +28,10 @@ namespace BitcoinCrawler
 			this._appServiceOptions = appServiceOptions.Value;
 		}
 
-		public void Run(CancellationToken token = default(CancellationToken))
+		public Task[] Run(CancellationToken token)
 		{
+			//CancellationTokenSource cts = new CancellationTokenSource();
+
 			List<Task> workerTasks = new List<Task>();
 			Task orchestratorTask = this._harvestingOrchestratorService.Orchestrate(token);
 			Task printoutTask = this._printoutService.Execute(token);
@@ -37,12 +39,24 @@ namespace BitcoinCrawler
 			for (int i = 0; i < this._appServiceOptions.Threads; i += 1)
 			{
 				Harvesting.HarvestingWorkerService worker = this._serviceProvider.GetRequiredService<Harvesting.HarvestingWorkerService>();
-				workerTasks.Add(worker.Execute(token));
+				Task workerTask = worker.Execute(token);
+				workerTasks.Add(workerTask);
 			}
 
-			token.WaitHandle.WaitOne();
+			return workerTasks.Union(new Task[] { orchestratorTask, printoutTask }).ToArray();
 
-			Task.WaitAll(workerTasks.Union(new Task[] { orchestratorTask, printoutTask }).ToArray());
+			//return new Task[] { orchestratorTask, printoutTask };
+
+			//if (Console.ReadKey().Key == ConsoleKey.Escape)
+			//{
+			//	cts.Cancel();
+			//}
+
+			//cts.Token.WaitHandle.WaitOne();
+
+			//Task.WaitAll(workerTasks.Union(new Task[] { orchestratorTask, printoutTask }).ToArray());
+
+			//cts.Dispose();
 		}
 	}
 }

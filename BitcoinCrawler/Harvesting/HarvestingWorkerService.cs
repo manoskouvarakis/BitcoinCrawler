@@ -25,7 +25,7 @@ namespace BitcoinCrawler.Harvesting
 		{
 			while (!token.IsCancellationRequested)
 			{
-				HarvestTask task = this._taskQueue.Take();
+				HarvestTask task = this._taskQueue.Take(token);
 
 				IHarvestingService harvester = this._harvestingServiceFactory.GetHarvestingService(task.Origin);
 
