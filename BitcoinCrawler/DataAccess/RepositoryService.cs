@@ -99,9 +99,9 @@ namespace BitcoinCrawler.DataAccess
 		{
 			switch (type)
 			{
-				case AggregateType.Average: return this.inMemoryStorage[currency].Where(filter).Average(x => x.Value);
-				case AggregateType.Max: return this.inMemoryStorage[currency].Where(filter).Max(x => x.Value);
-				case AggregateType.Min: return this.inMemoryStorage[currency].Where(filter).Min(x => x.Value);
+				case AggregateType.Average: return this.inMemoryStorage[currency].Where(filter).Select(x => x.Value).DefaultIfEmpty(0).Average();
+				case AggregateType.Max: return this.inMemoryStorage[currency].Where(filter).Select(x => x.Value).DefaultIfEmpty(0).Max();
+				case AggregateType.Min: return this.inMemoryStorage[currency].Where(filter).Select(x => x.Value).DefaultIfEmpty(0).Min();
 				default: return 0;
 			}
 		}
@@ -110,9 +110,9 @@ namespace BitcoinCrawler.DataAccess
 		{
 			switch (type)
 			{
-				case AggregateType.Average: return this.inMemoryStorage[currency].Where(filter).TakeLast(takeLastElementsCounter).Average(x => x.Value);
-				case AggregateType.Max: return this.inMemoryStorage[currency].Where(filter).TakeLast(takeLastElementsCounter).Max(x => x.Value);
-				case AggregateType.Min: return this.inMemoryStorage[currency].Where(filter).TakeLast(takeLastElementsCounter).Min(x => x.Value);
+				case AggregateType.Average: return this.inMemoryStorage[currency].Where(filter).Select(x => x.Value).DefaultIfEmpty(0).AsQueryable().TakeLast(takeLastElementsCounter).Average();
+				case AggregateType.Max: return this.inMemoryStorage[currency].Where(filter).Select(x => x.Value).DefaultIfEmpty(0).AsQueryable().TakeLast(takeLastElementsCounter).Max();
+				case AggregateType.Min: return this.inMemoryStorage[currency].Where(filter).Select(x => x.Value).DefaultIfEmpty(0).AsQueryable().TakeLast(takeLastElementsCounter).Min();
 				default: return 0;
 			}
 		}

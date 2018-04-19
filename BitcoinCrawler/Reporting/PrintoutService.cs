@@ -82,18 +82,18 @@ namespace BitcoinCrawler.Reporting
 			Console.WriteLine("MIX: {0:N2} at {1} (UTC)", allHistoryMin.Value, allHistoryMin.Timestamp.DateTimeFromUnixTimestampSeconds());
 			Console.WriteLine();
 
-			Console.WriteLine("Last 5 prices");
+			Console.WriteLine("Last {0} prices", this._printoutServiceOptions.LastPrices);
 			Console.WriteLine("-------------");
-			Console.WriteLine("AVERAGE: {0:N2}", this._repositoryService.GetAggregatedValue(RepositoryService.AggregateType.Average, pair, 5));
-			Console.WriteLine("MAX: {0:N2}", this._repositoryService.GetAggregatedValue(RepositoryService.AggregateType.Max, pair, 5));
-			Console.WriteLine("MIX: {0:N2}", this._repositoryService.GetAggregatedValue(RepositoryService.AggregateType.Min, pair, 5));
+			Console.WriteLine("AVERAGE: {0:N2}", this._repositoryService.GetAggregatedValue(RepositoryService.AggregateType.Average, pair, this._printoutServiceOptions.LastPrices));
+			Console.WriteLine("MAX: {0:N2}", this._repositoryService.GetAggregatedValue(RepositoryService.AggregateType.Max, pair, this._printoutServiceOptions.LastPrices));
+			Console.WriteLine("MIX: {0:N2}", this._repositoryService.GetAggregatedValue(RepositoryService.AggregateType.Min, pair, this._printoutServiceOptions.LastPrices));
 			Console.WriteLine();
 
-			Console.WriteLine("Last 2 minutes");
+			Console.WriteLine("Last {0} minutes", this._printoutServiceOptions.LastMinutes);
 			Console.WriteLine("--------------");
-			Console.WriteLine("AVERAGE: {0:N2}", this._repositoryService.GetAggregatedValue(RepositoryService.AggregateType.Average, pair, x => x.Timestamp.BelongsToLastMinutes(2)));
-			Console.WriteLine("MAX: {0:N2}", this._repositoryService.GetAggregatedValue(RepositoryService.AggregateType.Max, pair, x => x.Timestamp.BelongsToLastMinutes(2)));
-			Console.WriteLine("MIX: {0:N2}", this._repositoryService.GetAggregatedValue(RepositoryService.AggregateType.Min, pair, x => x.Timestamp.BelongsToLastMinutes(2)));
+			Console.WriteLine("AVERAGE: {0:N2}", this._repositoryService.GetAggregatedValue(RepositoryService.AggregateType.Average, pair, x => x.Timestamp.BelongsToLastMinutes(this._printoutServiceOptions.LastMinutes)));
+			Console.WriteLine("MAX: {0:N2}", this._repositoryService.GetAggregatedValue(RepositoryService.AggregateType.Max, pair, x => x.Timestamp.BelongsToLastMinutes(this._printoutServiceOptions.LastMinutes)));
+			Console.WriteLine("MIX: {0:N2}", this._repositoryService.GetAggregatedValue(RepositoryService.AggregateType.Min, pair, x => x.Timestamp.BelongsToLastMinutes(this._printoutServiceOptions.LastMinutes)));
 		}
 	}
 }
