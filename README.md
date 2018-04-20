@@ -38,6 +38,6 @@ The base action of the application is **HarvestTask** that consist of pairs of [
 **HarvestingWorkerService** checks periodically (default every 10 seconds) the concurrent collection for new tasks and if it finds one, it handles it through the respective exchange service created by **HarvestingServiceFactory**.
 Every new price is stored in memory by **RepositoryService** that implements a concurrent dictionary with key the currency pair and values of concurrent queues of prices (the size of that queue is configurable and default is set to 10).
 
-**PrintoutService** wakes up every x seconds (default is 10) and prints statistics about new prices with aggregated data fetched from **Repository Service**.
+**PrintoutService** wakes up every x seconds (default is 10) and prints statistics about new prices with aggregated data fetched from **RepositoryService**.
 
-Every parameter for the application to execute is configured through appsettings.json.
+Every parameter for the application to execute is configured through **appsettings.json**.
