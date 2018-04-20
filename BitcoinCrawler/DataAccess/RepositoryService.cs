@@ -57,12 +57,6 @@ namespace BitcoinCrawler.DataAccess
 			return this.inMemoryStorage.IsEmpty;
 		}
 
-		public IBitcoinPrice Retrieve(decimal value)
-		{
-			return null;
-			//return this.queue.FirstOrDefault(x => x.GetValue() == value);
-		}
-
 		public IBitcoinPrice Max(CurrencyPair currencyPair)
 		{
 			return this.inMemoryStorage[currencyPair].MaxBy(x => x.Value);

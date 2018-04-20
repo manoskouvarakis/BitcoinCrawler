@@ -8,7 +8,6 @@ namespace BitcoinCrawler.DataAccess
     public interface IRepositoryService
     {
 		void Persist(IBitcoinPrice bitcoinPrice);
-		IBitcoinPrice Retrieve(decimal value);
 
 		Boolean IsEmpty();
 

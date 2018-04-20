@@ -30,8 +30,6 @@ namespace BitcoinCrawler
 
 		public Task[] Run(CancellationToken token)
 		{
-			//CancellationTokenSource cts = new CancellationTokenSource();
-
 			List<Task> workerTasks = new List<Task>();
 			Task orchestratorTask = this._harvestingOrchestratorService.Orchestrate(token);
 			Task printoutTask = this._printoutService.Execute(token);
@@ -44,19 +42,6 @@ namespace BitcoinCrawler
 			}
 
 			return workerTasks.Union(new Task[] { orchestratorTask, printoutTask }).ToArray();
-
-			//return new Task[] { orchestratorTask, printoutTask };
-
-			//if (Console.ReadKey().Key == ConsoleKey.Escape)
-			//{
-			//	cts.Cancel();
-			//}
-
-			//cts.Token.WaitHandle.WaitOne();
-
-			//Task.WaitAll(workerTasks.Union(new Task[] { orchestratorTask, printoutTask }).ToArray());
-
-			//cts.Dispose();
 		}
 	}
 }
